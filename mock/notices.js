@@ -82,6 +82,4 @@ const getNotices = (req, res) => {
   }]);
 };
 
-export default {
-  getNotices,
-};
+export default getNotices

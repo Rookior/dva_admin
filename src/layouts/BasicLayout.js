@@ -160,6 +160,7 @@ class BasicLayout extends React.PureComponent {
             <div style={{ minHeight: 'calc(100vh - 260px)' }}>
               <Switch>
                 {
+
                   getRoutes(match.path, routerData).map(item =>
                     (
                       <AuthorizedRoute

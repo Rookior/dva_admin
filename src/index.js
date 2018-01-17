@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import dva from 'dva';
+import createLoading from 'dva-loading'
 import 'moment/locale/zh-cn';
 import FastClick from 'fastclick';
 import './g2';
@@ -14,6 +15,7 @@ const app = dva({
 });
 
 // 2. Plugins
+app.use(createLoading({effects: true}));
 // app.use({});
 
 // 3. Register global model

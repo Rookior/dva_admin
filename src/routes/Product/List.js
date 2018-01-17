@@ -10,7 +10,7 @@ const FormItem = Form.Item;
 const getValue = obj => Object.keys(obj).map(key => obj[key]).join(',');
 
 @connect(state => ({
-  list: state.franchiser,
+  list: state.product_details,
 }))
 @Form.create()
 export default class List extends PureComponent {
@@ -18,6 +18,12 @@ export default class List extends PureComponent {
       selectedRows: [],
       formValues: {},
     };
+    componentDidMount() {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'product_details/fetch',
+      });
+    }
     handleStandardTableChange = (pagination, filtersArg, sorter) => {
       const { dispatch } = this.props;
       const { formValues } = this.state;

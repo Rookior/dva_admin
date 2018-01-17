@@ -13,7 +13,7 @@ const { Option } = Select;
 const getValue = obj => Object.keys(obj).map(key => obj[key]).join(',');
 
 @connect(state => ({
-  list: state.franchiser,
+  list: state.supplier,
 }))
 @Form.create()
 export default class List extends PureComponent {

@@ -1,5 +1,5 @@
-import { getNotices } from './mock/notices';
-import { getRule, postRule } from './mock/rule';
+import getNotices from './mock/notices';
+import { findRule, postRule, destroyRule, getRule } from './mock/rule';
 import { delay } from 'roadhog-api-doc';
 
 // 是否禁用代理
@@ -7,7 +7,8 @@ const noProxy = process.env.NO_PROXY === 'true';
 
 // 代码中会兼容本地 service mock 以及部署站点的静态数据
 const proxy = {
-  'GET /api/rule': getRule,
+  'GET /api/rule': findRule,
+  'GET /api/rule/get': getRule,
   'POST /api/rule': {
     $params: {
       pageSize: {
@@ -16,6 +17,15 @@ const proxy = {
       },
     },
     $body: postRule,
+  },
+  'DELETE /api/rule': {
+    $params: {
+      pageSize: {
+        desc: '分页',
+        exp: 2,
+      },
+    },
+    $body: destroyRule,
   },
   // 支持值为 Object 和 Array
   'GET /api/currentUser': {
@@ -54,21 +64,21 @@ const proxy = {
   /*用户登录*/
   'POST /api/login/account': (req, res) => {
     const { password, userName, type } = req.body;
-    if(password === '888888' && userName === 'admin'){
+    if (password === '888888' && userName === 'admin') {
       res.send({
         status: 'ok',
         type,
         currentAuthority: 'admin'
       });
-      return ;
+      return;
     }
-    if(password === '123456' && userName === 'user'){
+    if (password === '123456' && userName === 'user') {
       res.send({
         status: 'ok',
         type,
         currentAuthority: 'user'
       });
-      return ;
+      return;
     }
     res.send({
       status: 'error',

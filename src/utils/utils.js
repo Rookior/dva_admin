@@ -130,5 +130,6 @@ export function getRoutes(path, routerData) {
       exact,
     };
   });
+
   return renderRoutes;
 }

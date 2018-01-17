@@ -1,26 +1,30 @@
-import { getUrlParams } from './utils';
+import Mock from 'mockjs';
+import { getUrlParams, getByKeyInArray, NOTFOUND } from './utils';
 
-// mock tableListDataSource
-let tableListDataSource = [];
-for (let i = 0; i < 46; i += 1) {
-  tableListDataSource.push({
-    key: i,
-    disabled: ((i % 6) === 0),
-    href: 'https://ant.design',
-    avatar: ['https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png', 'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png'][i % 2],
-    no: `TradeCode ${i}`,
-    title: `一个任务名称 ${i}`,
-    owner: '曲丽丽',
-    description: '这是一段描述',
-    callNo: Math.floor(Math.random() * 1000),
-    status: Math.floor(Math.random() * 10) % 4,
-    updatedAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
-    createdAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
-    progress: Math.ceil(Math.random() * 100),
-  });
-}
+let tableListDataSource = Mock.mock({
+  'data|80-100': [
+    {
+      key: '@increment',
+      disabled: '@boolean',
+      href: 'https://ant.design',
+      no: '@string(number,8)',
+      title: '@ctitle',
+      owner: '@cname',
+      avatar() {
+        return Mock.Random.image('100x100', Mock.Random.color(), '#757575', 'png', this.owner.substr(0, 1));
+      },
+      description: '这是一段描述',
+      'callNo|0-999': 323,
+      'status|0-3': 0,
+      createdAt: '@datetime',
+      updatedAt: '@datetime',
+      'progress|0-99': 50,
+    },
+  ],
+}).data;
 
-export function getRule(req, res, u) {
+
+export function findRule(req, res, u) {
   let url = u;
   if (!url || Object.prototype.toString.call(url) !== '[object String]') {
     url = req.url; // eslint-disable-line
@@ -59,14 +63,10 @@ export function getRule(req, res, u) {
   if (params.pageSize) {
     pageSize = params.pageSize * 1;
   }
-
+  const currentPage = parseInt(params.currentPage, 10) || 1;
   const result = {
-    list: dataSource,
-    pagination: {
-      total: dataSource.length,
-      pageSize,
-      current: parseInt(params.currentPage, 10) || 1,
-    },
+    list: dataSource.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    total: dataSource.length,
   };
 
   if (res && res.json) {
@@ -76,56 +76,78 @@ export function getRule(req, res, u) {
   }
 }
 
+export function getRule(req, res, u) {
+  let url = u;
+  if (!url || Object.prototype.toString.call(url) !== '[object String]') {
+    url = req.url; // eslint-disable-line
+  }
+
+  const params = getUrlParams(url);
+
+  const data = getByKeyInArray(tableListDataSource, params.id, 'key');
+  if (res && res.json) {
+    res.status(200).json(data || {});
+  } else {
+    return data;
+  }
+}
+export function destroyRule(req, res, u, b) {
+  const body = (b && b.body) || req.body;
+  const { key } = body;
+  const idArray = key.split(',');
+  for (const id of idArray) {
+    const data = getByKeyInArray(tableListDataSource, id, 'key');
+    if (data) {
+      tableListDataSource = tableListDataSource.filter(item => item.key !== data.key);
+    }
+  }
+
+  if (res && res.json) {
+    res.status(204).json();
+  } else {
+    return '';
+  }
+}
 export function postRule(req, res, u, b) {
   let url = u;
   if (!url || Object.prototype.toString.call(url) !== '[object String]') {
     url = req.url; // eslint-disable-line
   }
 
+  const params = getUrlParams(url);
+  console.log(params);
+
   const body = (b && b.body) || req.body;
-  const { method, no, description } = body;
+  const id = Number.parseInt(body.id, 10);
+  let isExist = false;
+  if (id) {
+    tableListDataSource = tableListDataSource.map((item) => {
+      if (item.id === id) {
+        isExist = true;
+        return Object.assign({}, item, body);
+      }
+      return item;
+    });
 
-  switch (method) {
-    /* eslint no-case-declarations:0 */
-    case 'delete':
-      tableListDataSource = tableListDataSource.filter(item => no.indexOf(item.no) === -1);
-      break;
-    case 'post':
-      const i = Math.ceil(Math.random() * 10000);
-      tableListDataSource.unshift({
-        key: i,
-        href: 'https://ant.design',
-        avatar: ['https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png', 'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png'][i % 2],
-        no: `TradeCode ${i}`,
-        title: `一个任务名称 ${i}`,
-        owner: '曲丽丽',
-        description,
-        callNo: Math.floor(Math.random() * 1000),
-        status: Math.floor(Math.random() * 10) % 2,
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        progress: Math.ceil(Math.random() * 100),
-      });
-      break;
-    default:
-      break;
-  }
-
-  const result = {
-    list: tableListDataSource,
-    pagination: {
-      total: tableListDataSource.length,
-    },
-  };
-
-  if (res && res.json) {
-    res.json(result);
+    if (isExist) {
+      res.status(201).json({ success: true });
+    } else {
+      res.status(404).json(NOTFOUND);
+    }
   } else {
-    return result;
+    delete body.id;
+    body.createTime = Mock.mock('@now');
+    body.key = Mock.mock('@id');
+    body.no = Mock.mock('@string(number,8)');
+    body.callNo = Mock.Random.natural(0, 999);
+    tableListDataSource.unshift(body);
+    res.json({ success: true });
   }
 }
 
 export default {
+  findRule,
   getRule,
+  destroyRule,
   postRule,
 };

@@ -6,8 +6,12 @@ export const imgMap = {
   d: 'https://gw.alipayobjects.com/zos/rmsportal/jvpNzacxUYLlNsHTtrAD.png',
 };
 
+export const NOTFOUND = {
+  message: 'Not Found',
+};
+
 // refers: https://www.sitepoint.com/get-url-parameters-with-javascript/
-export function getUrlParams(url) {
+export const getUrlParams = (url)=> {
   const d = decodeURIComponent;
   let queryString = url ? url.split('?')[1] : window.location.search.slice(1);
   const obj = {};
@@ -37,9 +41,29 @@ export function getUrlParams(url) {
     }
   }
   return obj;
-}
+};
 
+export const getByKeyInArray = (array, key, keyAlias = 'key') => {
+  if (!(array instanceof Array)) {
+    return null;
+  }
+  let data;
+
+  for (const item of array) {
+    if (String(item[keyAlias]) === String(key)) {
+      data = item;
+      break;
+    }
+  }
+
+  if (data) {
+    return data;
+  }
+  return null;
+};
 export default {
   getUrlParams,
+  getByKeyInArray,
   imgMap,
+  NOTFOUND,
 };

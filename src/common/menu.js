@@ -50,7 +50,7 @@ const menuData = [{
   path: 'result',
   children: [{
     name: '服务商管理',
-    path: 'service-provider',
+    path: 'service_provider',
   }, {
     name: '订单进程',
     path: 'order-process',
@@ -70,11 +70,23 @@ const menuData = [{
 }, {
   name: '系统管理',
   icon: 'warning',
-  path: 'exception',
+  path: 'system',
   children: [{
-    name: '权限管理',
-    path: 'authority-management',
+    name: '部门管理',
+    path: 'management_department',
     // authority: 'user',
+  }, {
+    name: '用户管理',
+    path: 'management_user',
+  }, {
+    name: '角色管理',
+    path: 'management_role',
+  }, {
+    name: '系统管理',
+    path: 'management_system',
+  }, {
+    name: '日志管理',
+    path: 'management_log',
   }],
 }];
 
