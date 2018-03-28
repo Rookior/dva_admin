@@ -12,6 +12,10 @@ npm install --save
 其他依赖
 npm install webpack --save
 npm install react-redux redux --save
+npm install roadhog --save
+npm install react-router --save
+npm install styles --save
+npm install ansi-styles --save
 
 运行
 npm start
