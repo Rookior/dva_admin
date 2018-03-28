@@ -1,1 +1,22 @@
 ## OK 无忧管理后台 UI
+
+
+依赖node.js环境
+
+全局安装cnpm淘宝镜像
+npm install cnpm -g --registry=https://registry.npm.taobao.org
+
+初始化依赖
+npm install --save
+
+其他依赖
+npm install webpack --save
+npm install react-redux redux --save
+
+运行
+npm start
+
+打包
+npm run build
+
+
